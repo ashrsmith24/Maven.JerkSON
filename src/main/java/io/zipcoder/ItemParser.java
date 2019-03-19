@@ -4,15 +4,50 @@ import com.sun.xml.internal.fastinfoset.util.StringArray;
 import io.zipcoder.utils.Item;
 import io.zipcoder.utils.ItemParseException;
 
-import java.util.List;
+import java.util.*;
 
 public class ItemParser {
+    // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##
+    // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##
+    // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##
     public List<Item> parseItemList(String valueToParse) {
-        parseSingleItem().
+        List<Item> resultList = new ArrayList<>();
+        // split string at the pound to get itemArray
+        String[] itemArray = valueToParse.split("##");
+        // [naMe:Milk;price:3.23;type:Food;expiration:1/25/2016,
+        // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016,
+        // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016]
+
+
+        // for itemString in itemArray
+        for (int i = 0; i < itemArray.length; i++) {
+            String itemString = itemArray[i];
+
+            Item parsedItem = null;
+            try {
+                // parse itemString
+                parsedItem = parseSingleItem(itemString);
+
+                // add parsedItem to resultList
+                resultList.add(parsedItem);
+            } catch (ItemParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultList;
     }
 
     // naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##
     public Item parseSingleItem(String singleItem) throws ItemParseException {
+       try {
+           return findItem(singleItem);
+       } catch (Exception e){
+           throw new ItemParseException();
+       }
+
+    }
+
+    private Item findItem(String singleItem) {
         Item result = null;
         String name = null;
         Double price = null;
@@ -63,7 +98,7 @@ public class ItemParser {
             }
         }
         // instantiate object with name, price, type, and expiration
-                    result = new Item(name,price,type,expiration);
+        result = new Item(name,price,type,expiration);
         return result;
     }
 }
